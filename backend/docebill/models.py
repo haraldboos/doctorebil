@@ -3,13 +3,13 @@ from django.db import models
 
 from django.conf import settings
 
-from django.contrib.auth.models import AbstractBaseUser ,BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser ,BaseUserManager ,PermissionsMixin
 from rest_framework.authtoken.models import Token
 import random
 
 # Create your models here.
 class UserManager(BaseUserManager):
-    def create_user(self, email, username, password=None):
+    def create_user(self, email, username, password=None,*args,**kargs):
         if not email:
             raise ValueError('You must have enter the email address')
         if not username:
@@ -30,21 +30,56 @@ class UserManager(BaseUserManager):
         user.is_admin = True
         user.is_staff=True
         user.is_superuser = True
+        user.is_doctor = True
+
+        user.is_pharmacy = True
         user.save(using=self._db)
         return user
-class Doctor(AbstractBaseUser):
+    def create_dcophar(self, email, username, password=None,medireg=None,clinic=None,clinicreg=None,*args,**kwargs):
+        if not email:
+            raise ValueError('You must have enter the email address')
+        if not username:
+            raise ValueError('you must have a usernmame')
+                
+        x=args,kwargs
+        doc,phar=kwargs
+        print(kwargs)
+        print(doc)
+        user = self.model(
+            email=self.normalize_email(email),
+            username=username,
+            medireg=medireg,
+            clinic=clinic,
+            clinicreg=clinicreg,
+            is_doctor=kwargs['is_doctor'],
+            is_pharmacy=kwargs['is_pharmacy']
+
+        )
+        x=args,kwargs
+        print(x)
+        user.set_password(password)
+        user.save(using=self._db)
+        # return us
+        return user
+    
+class Medical(AbstractBaseUser,PermissionsMixin):
     email = models.EmailField(verbose_name="enter ur contact email",max_length=60,unique=True)
     username= models.CharField(max_length=30,unique=True)
     medireg = models.CharField(verbose_name="enter ur medical identification number",max_length=20,unique=True)
     clinic = models.CharField(verbose_name="enter ur clinic name",max_length=30)
     clinicreg = models.CharField(verbose_name="enter ur clinic registration number",unique=True,max_length=10)
     date_joined= models.DateTimeField(verbose_name="datejoined",auto_now_add=True)
+    status=models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    is_doctor=models.BooleanField(default=False)
+    is_pharmacy=models.BooleanField(default=False)
+    is_superuser =models.BooleanField(default=False)
 
     USERNAME_FIELD='email'
-    REQUIRED_FIELDS=['username']
+    REQUIRED_FIELDS=['username',]
     objects = UserManager()
+    
     def __str__(self):
         return str(self.id)
 
@@ -54,28 +89,28 @@ class Doctor(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
-class Pharmacy(AbstractBaseUser):
-    email = models.EmailField(verbose_name="enter ur contact email",max_length=60,unique=True)
-    username= models.CharField(max_length=30,unique=True)
-    medireg = models.CharField(verbose_name="enter ur medical identification number",max_length=20,unique=True)
-    clinic = models.CharField(verbose_name="enter ur clinic name",max_length=30)
-    clinicreg = models.CharField(verbose_name="enter ur clinic registration number",unique=True,max_length=10)
-    date_joined= models.DateTimeField(verbose_name="datejoined",auto_now_add=True)
-    is_admin = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
+# class Pharmacy(AbstractBaseUser):
+#     email = models.EmailField(verbose_name="enter ur contact email",max_length=60,unique=True)
+#     username= models.CharField(max_length=30,unique=True)
+#     medireg = models.CharField(verbose_name="enter ur medical identification number",max_length=20,unique=True)
+#     clinic = models.CharField(verbose_name="enter ur clinic name",max_length=30)
+#     clinicreg = models.CharField(verbose_name="enter ur clinic registration number",unique=True,max_length=10)
+#     date_joined= models.DateTimeField(verbose_name="datejoined",auto_now_add=True)
+#     is_admin = models.BooleanField(default=False)
+#     is_staff = models.BooleanField(default=False)
+#     is_pharmacy=models.BooleanField(default=True)
+#     USERNAME_FIELD='email'
+#     REQUIRED_FIELDS=['username']
+#     objects = UserManager()
 
-    USERNAME_FIELD='email'
-    REQUIRED_FIELDS=['username']
-    objects = UserManager()
+#     def __str__(self):
+#         return str(self.id)
 
-    def __str__(self):
-        return str(self.id)
+#     def has_perm(self, perm, obj=None):
+#         return self.is_admin
 
-    def has_perm(self, perm, obj=None):
-        return self.is_admin
-
-    def has_module_perms(self, app_label):
-        return True
+#     def has_module_perms(self, app_label):
+#         return True
 
 
 class Desies(models.Model):
@@ -114,7 +149,7 @@ class collection(models.Model):
 
 class Bill(models.Model):
     bilid=models.IntegerField(unique=True,default=random.randint(10000,99999))
-    billdoc=models.ForeignKey(Doctor,on_delete=models.CASCADE)
+    billdoc=models.ForeignKey(Medical,on_delete=models.CASCADE)
     billtime= models.DateTimeField(auto_now_add=True)
     smsnumber=models.CharField(max_length=10,default=None)
     bilnote = models.TextField(max_length=100,default=None,blank=True)
@@ -125,10 +160,5 @@ class Bill(models.Model):
 class billphar(models.Model):
     bill = models.ForeignKey(Bill,on_delete=models.CASCADE)
     collid = models.ForeignKey(collection,on_delete=models.CASCADE)
-    billedpharmacy = models.ForeignKey(Pharmacy,on_delete=models.CASCADE)
+    billedpharmacy = models.ForeignKey(Medical,on_delete=models.CASCADE)
 
-class DoctorToken(Token):
-    doctor = models.OneToOneField(Doctor, related_name='doctor_auth_token', on_delete=models.CASCADE)
-    
-class PharmacyToken(Token):
-    pharmacy = models.OneToOneField(Pharmacy, related_name='pharmacy_auth_token', on_delete=models.CASCADE)

@@ -19,5 +19,8 @@ from django.urls import path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('docebill.urls'))
+    path('',include('docebill.urls')),
+    # path('rest-auth/', include('rest_auth.urls')),
+    path('rest/', include('rest_framework.urls')),
+
 ]
