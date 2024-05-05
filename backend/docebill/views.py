@@ -43,9 +43,13 @@ class log(APIView):
 
 class medicinelistview(generics.CreateAPIView):
     queryset= Medical.objects.all()
-    permission_classes=[IsAuthenticated]
-    serializer_class=MedicalSerializer
+    permission_classes=[AllowAny]
+    serializer_class=MedicinSerializer
 
+@api_view(['GET'])
+def mideview(request):
+    medicine=medicine.objects.all()
+    return medicine
 # class CreatePharmacy(generics.CreateAPIView):
 #     queryset = Doctor.objects.all()
 #     serializer_class = PharmacySerializer
@@ -63,3 +67,38 @@ class HomeView(APIView):
    def get(self, request):
         content = {'message': 'Welcome to the JWT Authentication page using React Js and Django!'}
         return Response(content)
+   
+class medicinelisting(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self,request):
+           Medicine_queryset=medicine.objects.filter(status=True)
+           medicine_serializer=MedicinSerializer(Medicine_queryset,many=True)
+           subdesies_query=subdesies.objects.all()
+           subdesies_serilzer=SubdiseSerializer(subdesies_query,many=True)
+           response_data={
+               'medicine': medicine_serializer.data,
+               'desies':subdesies_serilzer.data
+
+           }
+           return Response(response_data)
+    def post(self, request):
+        serializer = CollectionSerilazer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            print(serializer.data)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+        #    return Response(request)
+class Billcreate(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self,request):
+        queryset = Bill.objects.all()
+        serializers=Billserilazation(queryset,many=True)
+        if serializers.is_valid():
+            serializers.save()
+            print(serializers.data)
+            return Response(serializers.data)

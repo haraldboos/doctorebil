@@ -123,6 +123,9 @@ class subdesies(models.Model):
     minidid=models.AutoField(primary_key=True,unique=True)
     maindesis=models.ForeignKey(Desies,on_delete=models.CASCADE)
     subdesiesna = models.CharField(max_length=45,default=None)
+    
+    def __str__(self):
+        return str(self.minidid)
 
 class medicine(models.Model):
     medineid=models.AutoField(primary_key=True,unique=True)
@@ -161,4 +164,7 @@ class billphar(models.Model):
     bill = models.ForeignKey(Bill,on_delete=models.CASCADE)
     collid = models.ForeignKey(collection,on_delete=models.CASCADE)
     billedpharmacy = models.ForeignKey(Medical,on_delete=models.CASCADE)
+
+    def __str__(self):
+       return str(self.bill)
 

@@ -9,9 +9,9 @@ urlpatterns=[
     path('log',views.log.as_view(),name="authlogin"),
 
     # path('registerphar/',views.CreatePharmacy.as_view(),name="pharcre"),
-    # path('login/',views.login,name="login"),
+    path('madin/',views.medicinelisting.as_view(),name="log"),
     path('login/',views.logiin.as_view(),name="login"),
-    path('logincheck/',views.medicinelistview.as_view(),name="login"),
+    path('medi/',views.medicinelistview.as_view(),name="login"),
     
 
     path('token',TokenObtainPairView.as_view(),name="token_obtain_pair"),
