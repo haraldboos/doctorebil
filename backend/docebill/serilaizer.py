@@ -40,3 +40,11 @@ class Billserilazation(serializers.ModelSerializer):
 
         # pass
 
+class Pharmacyserlizer(serializers.model):
+    bill_id = serializers.PrimaryKeyRelatedField(queryset=Bill.objects.all(),source='bill')
+    collection_id=serializers.PrimaryKeyRelatedField(queryset=collection.objects.all(),source='collid')
+    bill_by_pharmacy=serializers.PrimaryKeyRelatedField(queryset=Medical.objects.all(),source='billedpharmacy')
+    class Meta:
+        model=billphar
+        fields='__all__'
+    # pass
