@@ -34,13 +34,15 @@ class CollectionSerilazer(serializers.ModelSerializer):
 class Billserilazation(serializers.ModelSerializer):
         coll_id = serializers.PrimaryKeyRelatedField(queryset=collection.objects.all(),source='medicine')
         doc_id =serializers.PrimaryKeyRelatedField(queryset=Medical.objects.all(),source='billdoc')
+        # medicine=MedicinSerializer()
+        # billdoc=MedicalSerializer()
         class Meta:
             model=Bill
-            fields='__all__'
+            exclude=['billdoc','medicine']
 
         # pass
 
-class Pharmacyserlizer(serializers.model):
+class Pharmacyserlizer(serializers.ModelSerializer):
     bill_id = serializers.PrimaryKeyRelatedField(queryset=Bill.objects.all(),source='bill')
     collection_id=serializers.PrimaryKeyRelatedField(queryset=collection.objects.all(),source='collid')
     bill_by_pharmacy=serializers.PrimaryKeyRelatedField(queryset=Medical.objects.all(),source='billedpharmacy')

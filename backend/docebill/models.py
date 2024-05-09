@@ -154,9 +154,9 @@ class Bill(models.Model):
     bilid=models.IntegerField(unique=True,default=random.randint(10000,99999))
     billdoc=models.ForeignKey(Medical,on_delete=models.CASCADE)
     billtime= models.DateTimeField(auto_now_add=True)
-    smsnumber=models.CharField(max_length=10,default=None)
+    smsnumber=models.CharField(max_length=10,default=None,blank=True)
     bilnote = models.TextField(max_length=100,default=None,blank=True)
-    medicine = models.ManyToManyField(collection)
+    medicine =  models.ForeignKey(collection, on_delete=models.CASCADE, null=True)
     
     def __str__(self):
        return str(self.bilid)
@@ -164,6 +164,7 @@ class billphar(models.Model):
     bill = models.ForeignKey(Bill,on_delete=models.CASCADE)
     collid = models.ForeignKey(collection,on_delete=models.CASCADE)
     billedpharmacy = models.ForeignKey(Medical,on_delete=models.CASCADE)
+    
 
     def __str__(self):
        return str(self.bill)

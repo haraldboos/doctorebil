@@ -97,8 +97,23 @@ class Billcreate(APIView):
 
     def post(self,request):
         queryset = Bill.objects.all()
-        serializers=Billserilazation(queryset,many=True)
+        serializers=Billserilazation(data=request.data)
         if serializers.is_valid():
             serializers.save()
             print(serializers.data)
-            return Response(serializers.data)
+            return Response(serializers.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class Billedphar(APIView):
+        permission_classes = [AllowAny]
+        def post(self,request):
+            queryset = billphar.objectss.all()
+            for x in request:
+                print(x)
+            serializers=Pharmacyserlizer(data=request.data)
+            if serializers.is_valid():
+                serializers.save()
+                print(serializers.data)
+                return Response(serializers.data)
+
