@@ -23,22 +23,28 @@ class SubdiseSerializer(serializers.ModelSerializer):
     class Meta:
         model=subdesies
         fields='__all__'
+class NormalCollectionSerilaizer():
+    class Meta:
+        model=collection
+        fields='__all__'
 
 class CollectionSerilazer(serializers.ModelSerializer):
     subdesies_id= serializers.PrimaryKeyRelatedField(queryset=subdesies.objects.all(),source='subdesies')
     medicine_id = serializers.PrimaryKeyRelatedField(queryset=medicine.objects.all(),source='medicine')
     class Meta:
         model=collection
-        fields=['subdesies_id','medicine_id','days', 'note']
+        fields=['subdesies_id','medicine_id','days', 'note','collid']
 
 class Billserilazation(serializers.ModelSerializer):
-        coll_id = serializers.PrimaryKeyRelatedField(queryset=collection.objects.all(),source='medicine')
+        coll_id = serializers.PrimaryKeyRelatedField(queryset=collection.objects.all(),source='collctionid')
         doc_id =serializers.PrimaryKeyRelatedField(queryset=Medical.objects.all(),source='billdoc')
+        billdoc = serializers.CharField(required=False)
+
         # medicine=MedicinSerializer()
         # billdoc=MedicalSerializer()
         class Meta:
             model=Bill
-            exclude=['billdoc','medicine']
+            fields='__all__'
 
         # pass
 
@@ -50,3 +56,16 @@ class Pharmacyserlizer(serializers.ModelSerializer):
         model=billphar
         fields='__all__'
     # pass
+
+class MedicaluserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Medical
+        fields='__all__'
+
+class NormalBillSerilaizer(serializers.ModelSerializer):
+    billdoc=MedicaluserSerializer()
+    collctionid=NormalCollectionSerilaizer()
+
+    class Meta:
+        model=Bill
+        fields='__all__'

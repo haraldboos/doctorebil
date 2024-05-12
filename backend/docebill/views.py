@@ -72,6 +72,7 @@ class medicinelisting(APIView):
     permission_classes = [AllowAny]
 
     def get(self,request):
+           print(request.user)
            Medicine_queryset=medicine.objects.filter(status=True)
            medicine_serializer=MedicinSerializer(Medicine_queryset,many=True)
            subdesies_query=subdesies.objects.all()
@@ -83,11 +84,36 @@ class medicinelisting(APIView):
            }
            return Response(response_data)
     def post(self, request):
-        serializer = CollectionSerilazer(data=request.data)
+        print(request.user.id)
+        print(request.data)
+        dat= {
+            'doc_id':request.data['user']['user_id'],
+            'subdesies_id': request.data['subdesies_id'],
+            'medicine_id': request.data['medicine_id'],
+            'days': request.data['days'],
+            'note': request.data['note'],
+            'smsnumber':request.data['smsnumber'],
+            'bilnote':'hihih'
+        }
+        print(dat,1)
+        serializer = CollectionSerilazer(data=dat)
         if serializer.is_valid():
             serializer.save()
-
+            # print({'collid':collection.},111)
+            # dat['coll_id']=collection['collid']
+            dat['coll_id']=serializer.data['collid']
+            print(dat,"first step done")
             print(serializer.data)
+            billserlilazer=Billserilazation(data=dat)
+            if billserlilazer.is_valid():
+                billserlilazer.save()
+                print(billserlilazer.data)
+                return Response(billserlilazer.data, status=201)
+            else:
+                print("nononon")
+
+
+
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
@@ -117,3 +143,38 @@ class Billedphar(APIView):
                 print(serializers.data)
                 return Response(serializers.data)
 
+class userdetail(APIView):
+    permission_classes=[AllowAny]
+    def get(self,request):
+        print(request)
+        user_id=request.GET.get('userid')
+        print(user_id)
+        if not user_id:
+            return Response({"error": "User ID (pk) is missing in the request"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = Medical.objects.get(id=user_id)
+        except user.DoesNotExist:
+            return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = MedicaluserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        # pass
+
+class getbill(APIView):
+    permission_classes=[AllowAny]
+    def get(self,request):
+        print(request)
+        bill_id=request.GET.get('billid')
+        print(bill_id)
+        if not bill_id:
+            return Response({"error": "User ID (pk) is missing in the request"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            bill = Bill.objects.get(bilid=bill_id)
+        except bill.DoesNotExist:
+            return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = NormalBillSerilaizer(bill)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    

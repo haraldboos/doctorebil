@@ -156,7 +156,7 @@ class Bill(models.Model):
     billtime= models.DateTimeField(auto_now_add=True)
     smsnumber=models.CharField(max_length=10,default=None,blank=True)
     bilnote = models.TextField(max_length=100,default=None,blank=True)
-    medicine =  models.ForeignKey(collection, on_delete=models.CASCADE, null=True)
+    collctionid =  models.ForeignKey(collection, on_delete=models.CASCADE, null=True)
     
     def __str__(self):
        return str(self.bilid)
