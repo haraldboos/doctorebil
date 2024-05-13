@@ -93,7 +93,7 @@ class medicinelisting(APIView):
             'days': request.data['days'],
             'note': request.data['note'],
             'smsnumber':request.data['smsnumber'],
-            'bilnote':'hihih'
+            'bilnote':request.data['billnote']
         }
         print(dat,1)
         serializer = CollectionSerilazer(data=dat)
@@ -105,12 +105,13 @@ class medicinelisting(APIView):
             print(dat,"first step done")
             print(serializer.data)
             billserlilazer=Billserilazation(data=dat)
+            print(billserlilazer.is_valid())
             if billserlilazer.is_valid():
                 billserlilazer.save()
                 print(billserlilazer.data)
                 return Response(billserlilazer.data, status=201)
             else:
-                print("nononon")
+                print(billserlilazer.errors)
 
 
 

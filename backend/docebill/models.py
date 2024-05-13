@@ -149,12 +149,14 @@ class collection(models.Model):
 
 # class mdicaus
 
+def generate_unique_bilid():
+    return random.randint(10000, 99999)
 
 class Bill(models.Model):
-    bilid=models.IntegerField(unique=True,default=random.randint(10000,99999))
+    bilid=models.IntegerField(unique=True,default=generate_unique_bilid)
     billdoc=models.ForeignKey(Medical,on_delete=models.CASCADE)
     billtime= models.DateTimeField(auto_now_add=True)
-    smsnumber=models.CharField(max_length=10,default=None,blank=True)
+    smsnumber=models.CharField(max_length=12,default=None,blank=True)
     bilnote = models.TextField(max_length=100,default=None,blank=True)
     collctionid =  models.ForeignKey(collection, on_delete=models.CASCADE, null=True)
     

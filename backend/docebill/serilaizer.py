@@ -23,7 +23,9 @@ class SubdiseSerializer(serializers.ModelSerializer):
     class Meta:
         model=subdesies
         fields='__all__'
-class NormalCollectionSerilaizer():
+class NormalCollectionSerilaizer(serializers.ModelSerializer):
+    subdesies=SubdiseSerializer()
+    medicine=MedicinSerializer()
     class Meta:
         model=collection
         fields='__all__'
@@ -60,7 +62,7 @@ class Pharmacyserlizer(serializers.ModelSerializer):
 class MedicaluserSerializer(serializers.ModelSerializer):
     class Meta:
         model=Medical
-        fields='__all__'
+        fields=['clinic','clinicreg','is_doctor','is_pharmacy','id','username']
 
 class NormalBillSerilaizer(serializers.ModelSerializer):
     billdoc=MedicaluserSerializer()
